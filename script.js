@@ -1,58 +1,77 @@
-'use strict';
+const MODAL_ACTIVE_CLASS_NAME = 'modal-active';
 
-document.addEventListener('DOMContentLoaded', function(){
-    let form = document.getElementById('form');
-    form.addEventListener('submit', formSend);
+const formModal = document.querySelector('#form-modal');
+const successModal = document.querySelector('#success-modal');
+const form = document.querySelector('#form');
 
-    async function formSend(e){
-        e.preventDefault();
+const openFormModalBtn = document.querySelector('#open-form-modal-btn');
+const launchBtn = document.querySelector('#launch-btn');
+const closeBtns = document.querySelectorAll('.close-btn');
 
-        let error = formValidate(form);
-  
-        let formData = new FormData(form);
+openFormModalBtn.addEventListener('click', () => {
+    formModal.classList.add(MODAL_ACTIVE_CLASS_NAME);
+})
 
-        if (error === 0){
-            form.classList.add('_sending')
-            let response = await fetch('sendemail.php', {
-                method: 'POST',
-                body: formData
-            });
-            if (response.ok){
-                let result = awaut.response.json();
-                alert(result.message);
-                form.preview.innerHTML = '';
-                form.reset();
-                form.classList.remove('_sending')
-            }else{
-                alert('error')
-                form.classList.remove('_sending')
-            }
-        }else{
-            alert('write something')
-        }
+const closeFormModal = () => {
+    formModal.classList.remove(MODAL_ACTIVE_CLASS_NAME);
+};
 
-    }
+const closeSuccessModal = () => {
+    successModal.classList.remove(MODAL_ACTIVE_CLASS_NAME);
+};
 
-    function formValidate(form) {
-        let error = 0;
-        let formReq = document.querySelectorAll('._req');
+const openSuccessModal = () => {
+    successModal.classList.add(MODAL_ACTIVE_CLASS_NAME);
+};
 
-        for(let index =0; index< formReq.length; index++){
-            const input = formReq[index];
-            formRemoveError(input);
-            if(input.value === ''){
-                formAddError(input);
-                error++;
-            }
-        }
-        return error;
-    }
-    function formAddError(input){
-        input.parentElement.classList.add('_error');
-        input.classList.add('_error');
-    }
-    function formRemoveError(input){
-        input.parentElement.classList.remove('_error');
-        input.classList.remove('_error');
-    }
+closeBtns.forEach(btn => {
+    btn.addEventListener('click', e => {
+        e.stopPropagation();
+        closeFormModal();
+        closeSuccessModal();
+    })
+})
+
+function clearFormFields() {
+    const modalFiends = formModal.querySelectorAll('input');
+
+    modalFiends.forEach( field => { 
+        field.value = ''
+    });
+}
+
+function showGooseAnim() {
+    const targetContainer = document.querySelector('.modal-form');
+    const gusImage = document.createElement('img');
+    gusImage.setAttribute('src', './img/gus-anim.gif');
+    gusImage.classList.add('gus-anim');
+
+    targetContainer.appendChild(gusImage);
+
+    setTimeout(2000, () => {
+        targetContainer.removeChild(gusImage);
+    })
+}
+
+
+form.addEventListener('submit', e => {
+    e.preventDefault();
+    const formData = new FormData(form);
+
+    fetch("/", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams(formData).toString(),
+    })
+      .then(() => {
+        showGooseAnim();
+
+        setTimeout(() => {
+            closeFormModal();
+            setTimeout(openSuccessModal, 700);
+            setTimeout(closeSuccessModal, 4000);
+            clearFormFields();
+        }, 4000);
+      })
+      .catch((error) => console.log('Sending form failed'));
 })
