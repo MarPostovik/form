@@ -33,26 +33,12 @@ closeBtns.forEach(btn => {
 })
 
 function clearFormFields() {
-    const modalFiends = formModal.querySelectorAll('input');
+    const modalFields = formModal.querySelectorAll('input');
 
-    modalFiends.forEach( field => { 
+    modalFields.forEach( field => { 
         field.value = ''
     });
 }
-
-function showGooseAnim() {
-    const targetContainer = document.querySelector('.modal-form');
-    const gusImage = document.createElement('img');
-    gusImage.setAttribute('src', './img/gus-anim.gif');
-    gusImage.classList.add('gus-anim');
-
-    targetContainer.appendChild(gusImage);
-
-    setTimeout(2000, () => {
-        targetContainer.removeChild(gusImage);
-    })
-}
-
 
 form.addEventListener('submit', e => {
     e.preventDefault();
@@ -64,7 +50,6 @@ form.addEventListener('submit', e => {
       body: new URLSearchParams(formData).toString(),
     })
       .then(() => {
-        showGooseAnim();
 
         setTimeout(() => {
             closeFormModal();
